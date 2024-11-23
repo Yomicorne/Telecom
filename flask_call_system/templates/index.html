@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff8f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+        }
+        .top-bar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .top-bar button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .top-bar button:hover {
+            background-color: #ff7500;
+        }
+        .content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .left-section, .right-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-size: 1rem;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        button:hover:enabled {
+            background-color: #ff7500;
+        }
+        .output {
+            margin-top: 10px;
+        }
+        .output textarea {
+            width: 100%;
+            height: 250px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+            font-size: 1rem;
+        }
+        .output .action-buttons {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+        .output .action-buttons button {
+            padding: 8px 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <button id="language-toggle">Change to Korean</button>
+        </div>
+        <form action="/" method="POST">
+            <div class="content">
+                <!-- Left Section -->
+                <div class="left-section">
+                    <div class="form-group">
+                        <label id="website-label" for="website">Website URL:</label>
+                        <input type="text" id="website" name="url" placeholder="https://example.com">
+                    </div>
+                    <div class="button-group">
+                        <button type="submit" id="scrape-button">Scrape Website</button>
+                        <button id="automate-button" disabled>Automate Call</button>
+                    </div>
+                </div>
+                <!-- Right Section -->
+                <div class="right-section">
+                    <div class="output">
+                        <h3 id="scraped-title">Scraped Phone Numbers:</h3>
+                        <textarea id="output" readonly>
+{% if phone_numbers %}
+{% for number in phone_numbers %}
+{{ number }}
+{% endfor %}
+{% endif %}
+                        </textarea>
+                        <div class="action-buttons">
+                            <button id="copy-button" type="button" onclick="copyData()">Copy Data</button>
+                            <button id="download-button" type="button" onclick="downloadData()">Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Language toggle functionality
+        const languageToggle = document.getElementById("language-toggle");
+        const websiteLabel = document.getElementById("website-label");
+        const scrapeButton = document.getElementById("scrape-button");
+        const automateButton = document.getElementById("automate-button");
+        const scrapedTitle = document.getElementById("scraped-title");
+        const copyButton = document.getElementById("copy-button");
+        const downloadButton = document.getElementById("download-button");
+        let isEnglish = true;
+
+        languageToggle.addEventListener("click", () => {
+            if (isEnglish) {
+                websiteLabel.textContent = "웹사이트 URL:";
+                scrapeButton.textContent = "웹사이트 스크랩";
+                automateButton.textContent = "자동 호출";
+                scrapedTitle.textContent = "추출된 전화번호:";
+                copyButton.textContent = "데이터 복사";
+                downloadButton.textContent = "다운로드";
+                languageToggle.textContent = "Change to English";
+                isEnglish = false;
+            } else {
+                websiteLabel.textContent = "Website URL:";
+                scrapeButton.textContent = "Scrape Website";
+                automateButton.textContent = "Automate Call";
+                scrapedTitle.textContent = "Scraped Phone Numbers:";
+                copyButton.textContent = "Copy Data";
+                downloadButton.textContent = "Download";
+                languageToggle.textContent = "Change to Korean";
+                isEnglish = true;
+            }
+        });
+
+        // Copy data to clipboard
+        function copyData() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+            alert('Data copied to clipboard!');
+        }
+
+        // Download data
+        function downloadData() {
+            const output = document.getElementById('output').value;
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'phone_numbers.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>
