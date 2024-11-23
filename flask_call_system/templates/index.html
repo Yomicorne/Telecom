@@ -118,7 +118,11 @@
                     </div>
                     <div class="button-group">
                         <button type="submit" id="scrape-button">Scrape Website</button>
-                        <button id="automate-button" disabled>Automate Call</button>
+                        
+                        <!-- Enable "Automate Call" Button -->
+                        <button id="automate-button" onclick="automateCall()">Automate Call</button>
+
+
                     </div>
                 </div>
                 <!-- Right Section -->
@@ -143,6 +147,7 @@
     </div>
 
     <script>
+
         // Language toggle functionality
         const languageToggle = document.getElementById("language-toggle");
         const websiteLabel = document.getElementById("website-label");
@@ -192,6 +197,33 @@
             a.href = url;
             a.download = 'phone_numbers.txt';
             a.click();
+        }
+        async function automateCall() {
+            const numbers = document.getElementById("output").value.trim().split("\n");
+            if (numbers.length === 0) {
+                alert("No phone numbers available for calling.");
+                return;
+            }
+
+            try {
+                const response = await fetch("/automate_call", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ phone_numbers: numbers })
+                });
+
+                const result = await response.json();
+                const output = document.getElementById("output");
+                output.value = ""; // Clear previous output
+
+                result.forEach(entry => {
+                    output.value += `Call to ${entry.number}: ${entry.status}\n`;
+                });
+            } catch (error) {
+                alert("Failed to automate calls. Check the server or API configuration.");
+            }
         }
     </script>
 </body>
